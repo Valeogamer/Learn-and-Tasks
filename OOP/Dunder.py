@@ -6,6 +6,15 @@
 # если методы сравнения не реализованы то падает ошибка
 # contains - для реализации проверки содержит ли
 # проверка на bool in, bool для самодельных объектов всегда вернет True, для изменения поведения нужно писать __bool__
+# len - вернет ошибку если не переопределить метод
+# чтобы объект стал вызываемым (callable) нужно реализовать __call__
+# iter - возвращает объект итератор, тот кто реализует iter = Итерабл
+# __next__ - должен вернуть следующий объект из контейнера, кто его реализует = Итератор, for работает до stopIterrartion
+# __getitem__ - нужен для функционала [] (аналог списка и словаря)
+# __Setitem__ - для присвоения через [], если не реализовать = ошибка
+# если в объекте не реализован итер то для цикла for будет использован  __getitem__ там ожидается падение индексЕrror
+#
+
 class Banknote:
     def __init__(self, value: int):
         self.value = value
@@ -43,9 +52,23 @@ class Banknote:
         return self.value >= other.value
 
 
+class Iterator:
+    def __init__(self, container):
+        self.container = container
+        self.index = 0
+
+    def __next__(self):
+        while 0 <= self.index < len(self.container):
+            value = self.container[self.index]
+            self.index += 1
+            return value
+        raise StopIteration
+
+
 class Wallet:
 
     def __init__(self, *banknotes: Banknote):  # РАЗОБРАТЬСЯ С *
+        self.index = 0
         self.container = []
         self.container.extend(banknotes)
 
@@ -57,6 +80,26 @@ class Wallet:
 
     def __bool__(self):
         return len(self.container) > 0
+
+    def __len__(self):  # количество купюр, то есть количество экземпляров
+        return len(self.container)
+
+    def __call__(self):  # позволяет вызывать объекты нашего класса
+        # перебираем наш контейнер, получем оттуда наши объекты и складываем целые числа
+        return f'{sum(e.value for e in self.container)} рублей'
+
+    def __iter__(self):
+        return Iterator(self.container)
+
+    def __getitem__(self, item: int):
+        if item < 0 or item > len(self.container):
+            raise IndexError
+        return self.container[item]
+
+    def __setitem__(self, key: int, value: Banknote):
+        if key < 0 or key > len(self.container):
+            raise IndexError
+        self.container[key] = value
 
 
 if __name__ == '__main__':
@@ -73,7 +116,7 @@ if __name__ == '__main__':
     print(fifty > hundred)
     print(fifty <= hundred)
     print(fifty >= hundred)
-    wallet = Wallet(fifty, hundred)
+    wallet = Wallet(fifty, hundred, hundred)
     print(wallet)
     print(fifty in wallet)
     print(Banknote(500) in wallet)
@@ -84,3 +127,13 @@ if __name__ == '__main__':
         print('есть')
     else:
         print('Пусто')
+    print(len(wallet))  # количество купюр
+    print(wallet())
+    for money in wallet:  # next и iter
+        print(money)
+    for money in wallet:  # больше не подсчитает, потому что исчерпался итератор
+        # теперь создали отдельный класс и теперь все работает так как у нового класса индекс обнуляется при вызове
+        print(money)
+    print(wallet[0])  # setitem
+    print(wallet[2])
+    wallet[0] = Banknote(500)  # getitem
