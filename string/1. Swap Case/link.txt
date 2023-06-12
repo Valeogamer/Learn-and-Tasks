@@ -1,0 +1,2 @@
+1) https://www.digitalocean.com/community/tutorials/python-join-list
+2) https://www.techiedelight.com/ru/convert-string-to-uppercase-lowercase-python/
