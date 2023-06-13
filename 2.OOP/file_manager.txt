@@ -1,0 +1,84 @@
+--------------  1 JOBS  --------------
+~~~~~~~~~~  Загрузка данных и его обработка  ~~~~~~~~~~
+preprocess.py
+req.txt
+UPLOAD:  
+-fake_add.csv - убрал по 10 для дообучения
+-true_add.csv - убрал по 10 для дообучения
+
+-merged_test.csv - смешанный датасет для тестирования
+
+-Fake_new.csv - этот датасет не включает данные тестов и добавочные
+-True_new.csv - этот датасет не включает данные тестов и добавочные
+
+данные train test split:
+-X_train.csv
+-X_test.csv
+-Y_train.csv
+-Y_test.csv
+
+--------------  2 JOBS  --------------  
+~~~~~~~~~~  Выделение признаков  ~~~~~~~~~~
+feature.py
+req.txt
+DOWNLOAD:
+-X_test.csv
+-X_train.csv
+
+UPLOAD:
+данные векторизации:
+-xv_train.pickle
+-xv_test.pickle
+
+--------------  3 JOBS  --------------
+~~~~~~~~~~  Обучение и сохранение модели, + метрики  ~~~~~~~~~~
+learn_and_save.py
+req.txt
+DOWMLOAD:
+-xv_train.pickle
+-xv_test.pickle
+-Y_train.csv
+-Y_test.csv
+-merged.csv
+
+UPLOAD:
+метрики:
+-info.txt
+-result.txt
+
+модели:
+-model_lr.joblib
+-model_dt.joblib
+-model_gb.joblib
+-model_rf.joblib
+
+--------------  4 JOBS  --------------
+~~~~~~~~~~  Дообучение модели + save метрики  ~~~~~~~~~~
+learn_and_save_new.py
+DOWNLOAD:
+-xv_train.pickle
+-xv_test.pickle
+-Fake_new.csv
+-True_new.csv
+-fake_add.csv
+-true_add.csv
+-merged.csv
+
+UPLOAD:
+метрики 
+-new_info.txt
+-result.txt
+
+--------------  5 JOBS  --------------
+~~~~~~~~~~  Тестирование  ~~~~~~~~~~
+test_models.py
+UPLOAD:
+-model_lr.joblib
+-model_dt.joblib
+-model_gb.joblib
+-model_rf.joblib
+-X_train.csv
+-merged.csv
+
+DOWNLOAD:
+-result.txt
