@@ -1,0 +1,4 @@
+# Задача 3.
+# Напишите программу с пустым классом Country.
+# Опишите наследуемые от класса Country классы Russia, Canada, Germany.
+# Добавьте каждому классу поле population и опишите метод setPopulation и getPopulation.
