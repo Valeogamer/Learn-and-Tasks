@@ -59,4 +59,4 @@ def alphab(num) -> str:
 
 if __name__ == '__main__':
     num = int(input())
-    alphab_ascii(n)
+    alphab_ascii(num)
