@@ -44,6 +44,10 @@ def measure_cent_tendecy(values: list[int]):
     geom_mean = op ** ((1 / len(values)))
     print(f'Геометрическая средняя: {geom_mean:.2f}')
 
+    # Среднее гармоническое
+    garmonic_mean = len(values) / np.sum([1 / i for i in values])
+    print(f'Среднее гармоническое: {garmonic_mean:.2f}')
+
 
 if __name__ == '__main__':
     np.random.seed(12)
