@@ -15,7 +15,8 @@ def mean_v(values: list[float]) -> tuple[Any, ndarray]:
 
 def dispersion_v(values: list[float]) -> tuple[Any, ndarray]:
     """
-    Дисперсия
+    Дисперсия (смещенная)
+    n - 1 >> не смещенная Дисперсия
     """
     # np.var(values)  # вычисление дисперсии numpy
     return (np.sum([(i - mean_v(values)[1]) ** 2 for i in values])) / len(values), np.var(values)
@@ -24,17 +25,19 @@ def dispersion_v(values: list[float]) -> tuple[Any, ndarray]:
 def standard_deviation_v(values: list[float]) -> tuple[Any, ndarray]:
     """
     Стандартное отклонение
+    n - 1
     """
     # np.std(values)  # Стандартное отклонение
-    return np.sqrt(np.sum([(i - mean_v(values)[1]) ** 2 for i in values]) / len(values)), np.std(values)
+    return np.sqrt(np.sum([(i - mean_v(values)[1]) ** 2 for i in values]) / len(values) - 1), np.std(values)
 
 
 def root_mean_SD(values: list[float]) -> tuple[Any, ndarray]:
     """
     Среднеквадратичное отклонение
+    n
     """
     # np.std(values, ddof=1)  # Среднеквадратичное отклонение
-    return (np.sum([(i - mean_v(values)[1]) ** 2 for i in values]) / len(values) - 1) ** (1 / 2), np.std(values, ddof=1)
+    return (np.sum([(i - mean_v(values)[1]) ** 2 for i in values]) / len(values)) ** (1 / 2), np.std(values, ddof=1)
 
 
 def range_v(values: list[float]) -> tuple[ndarray]:
