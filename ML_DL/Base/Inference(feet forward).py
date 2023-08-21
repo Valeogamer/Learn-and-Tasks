@@ -75,5 +75,6 @@ def check_output_p(output: list[float]) -> float:
 
 if __name__ == '__main__':
     # на входе 3 скртый слой 5 на выходе 3
+    # гиперпараметры
     output = inference(3, 5, 3)
     print(output)
