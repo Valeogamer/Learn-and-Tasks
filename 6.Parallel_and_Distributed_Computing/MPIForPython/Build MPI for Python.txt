@@ -1,0 +1,12 @@
+Step 1
+	Download MS-MPI: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
+Step 2
+	Install:
+		1) msmsetup
+		2)msmdisk
+Step 3
+	PATH: => C:\Program Files\Microsoft MPI\Bin
+Step 4
+	open terminal:
+				> pip install mpi4py
+				> mpiexec -n 4 python script.py
