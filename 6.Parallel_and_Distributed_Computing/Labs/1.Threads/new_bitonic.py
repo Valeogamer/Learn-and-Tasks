@@ -1,173 +1,249 @@
 """
-Битоническая последовательность - монотонно возрастает и монотонно убывает (и наоборот)
-Битоническая последовательность
-Последовательность чисел называется битонической тогда и только тогда, когда
-1. Монотонно увеличивается, а затем монотонно уменьшается (decreasing)
-или монотонно уменьшается, а затем монотонно увеличивается (increasing)
-2. Может быть разделен на две части, которые можно поменять местами, чтобы получить
-любой из первых двух случаев.
+    +++ Link +++
+1. http://python-3.ru/page/multiprocessing
+2. https://docs.python.org/3.10/library/multiprocessing.html
 """
+from multiprocessing import Process, Queue, Pool
+import random
 import threading
-import multiprocessing
+from time import perf_counter
+import time
+import matplotlib.pyplot as plt
+import numpy
 
 
-# Подсчет переключений между < >
-def find_all_bitonic(n):
+def create_data(n: int, left=-5, right=5) -> list[int]:
     """
-    Подсчет количества всех битонических подпоследовательностей в массиве
-    Сложность O(n) линейно
+    Генерация списка из целых чисел, длиной N
     """
-    up = down = False
-    cnt = 0
-    for i in range(len(n) - 1):
-        if n[i + 1] > n[i]:
-            up = True
-            if down:
-                cnt += 1
-                down = False
-        elif n[i + 1] < n[i]:
-            down = True
-            if up:
-                cnt += 1
-                up = False
-    return print(cnt)
+    return [random.randint(left, right) for i in range(n)]
 
 
-def count_bitonic_subsequences(arr, start, end):
+def vizulation(data: int):
     """
-    Подсчет битонических подпоследовательностей в части массива arr[start:end]
+    Визуализация данных
     """
-    up = down = False
-    cnt = 0
-
-    for i in range(start, end - 1):
-        if arr[i + 1] > arr[i]:
-            up = True
-            if down:
-                cnt += 1
-                down = False
-        elif arr[i + 1] < arr[i]:
-            down = True
-            if up:
-                cnt += 1
-                up = False
-
-    return cnt
+    x = list(range(len(data)))
+    plt.plot(x, data, marker='o', linestyle='-', markersize=2)
+    plt.xlabel('Индекс')
+    plt.ylabel('Значение')
+    plt.title('График данных')
+    plt.xlim(0, len(data))
+    plt.grid(True)
+    plt.show()
 
 
-# поиск трендов
-def count_trend_changes(arr):
+def find_bitonic_count(data: list[int], start: int = 0, end=None, result=None) -> int:
     """
+    Подсчет количества битонических подпоследовательностей в части массива
     Сложность O(n)
     """
-    if len(arr) < 3:
-        return 0  # Если массив слишком короткий, то нет переключений
-
-    trend = "none"  # Начинаем без тренда
-    trend_changes = 0  # Инициализируем счетчик переключений
-    current_trend_length = 1  # Текущая длина текущего тренда (1 потому что есть сравниваемый элемент)
-
-    for i in range(1, len(arr)):
-        if arr[i] > arr[i - 1]:
-            if trend == "decreasing":
-                if current_trend_length > 2:
-                    trend_changes += 1
-                current_trend_length = 1
-            trend = "increasing"
-            current_trend_length += 1
-        elif arr[i] < arr[i - 1]:
-            if trend == "increasing":
-                if current_trend_length > 2:
-                    trend_changes += 1
-                current_trend_length = 1
-            trend = "decreasing"
-            current_trend_length += 1
-
-    return print(trend_changes)
-
-
-# поиск трендов с использованием Threads
-def count_trend_changes(arr, start, end, result_lock, trend_changes_total):
-    trend_changes_local = 0  # Локальный счетчик переключений для потока
-
-    if len(arr) < 3:
-        return 0  # Если массив слишком короткий, то нет переключений
-
-    trend = "none"  # Начинаем без тренда
-    current_trend_length = 1  # Текущая длина текущего тренда
-
-    for i in range(start + 1, end):
-        if arr[i] > arr[i - 1]:
-            if trend == "decreasing":
-                if current_trend_length > 2:
-                    trend_changes_local += 1
-                current_trend_length = 1
-            trend = "increasing"
-            current_trend_length += 1
-        elif arr[i] < arr[i - 1]:
-            if trend == "increasing":
-                if current_trend_length > 2:
-                    trend_changes_local += 1
-                current_trend_length = 1
-            trend = "decreasing"
-            current_trend_length += 1
-
-    # Захватываем блокировку, чтобы избежать гонки данных
-    with result_lock:
-        trend_changes_total.value += trend_changes_local
+    check = False
+    if end is None:
+        end = len(data)
+    if type(data) is tuple:
+        check = True
+        data, start, end = data[0], data[1], data[2]
+    up = down = False
+    cnt = 0
+    for i in range(start, end - 1):
+        if data[i + 1] > data[i]:
+            up = True
+            if down:
+                cnt += 1
+                down = False
+        elif data[i + 1] < data[i]:
+            down = True
+            if up:
+                cnt += 1
+                up = False
+    if check:
+        return cnt
+    elif result is None:
+        return print(f'Количество битонических подпоследовательностей: {cnt}')
+    elif type(result) != list:
+        result.put(cnt)
+    else:
+        result.append(cnt)
 
 
-if __name__ == '__main__':
-    n = [1, 1, 2, 3, 4, 3, 2, 1, 1, 8, 9, 10, -95, -96, -97, -97, 100, 101, 102]
-    nn = [6, 7, 1, 5, 3, 2, 4, 9, 3, 2, 8, 7]
-    nnn = [1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3]
-    nnnn = [-1, -1, -1, -2, -3, 3, 4, 5, 6, 6, 7, 6, 6, 8, 10, -100]
-    nnnnn = [1, 2, 3, 2, 1, 4, 3, 2, 1, 2, 3, 4]
-
-    # Использования многопоточности:
-    # num_threads = 1  # Количество потоков, которые вы хотите использовать
-    # result_lock = threading.Lock()  # Блокировка для синхронизации результатов
-    #
-    # # Создаем список потоков и разбиваем массив на сегменты для каждого потока
-    # threads = []
-    # segment_length = len(n) // num_threads
-    # trend_changes_total = multiprocessing.Value('i', 0)  # Общий счетчик переключений
-    #
-    # for i in range(num_threads):
-    #     start = i * segment_length
-    #     end = (i + 1) * segment_length if i < num_threads - 1 else len(n)
-    #     thread = threading.Thread(target=count_trend_changes, args=(n, start, end, result_lock, trend_changes_total))
-    #     threads.append(thread)
-    #     thread.start()
-    #
-    # # Ждем завершения всех потоков
-    # for thread in threads:
-    #     thread.join()
-    #
-    # print(trend_changes_total.value)
-
-    # Многопоточность для метода подсчета переключений
-    data = [-1, -1, -1, -2, -3, 3, 4, 5, 6, 6, 7, 6, 6, 8, 10, -100]
-    num_threads = 4  # Количество потоков
-
-    # Разделим массив на равные части для каждого потока
+def threading_find_all_bitonic(data: list[int], num_threads: int) -> int:
+    """
+    Параллельный подсчет количества всех битонических подпоследовательностей в массиве, Потоками
+    Сложность O(n)
+    """
+    result = []
     chunk_size = len(data) // num_threads
     threads = []
-
-    global_results = []  # Глобальный список для хранения результатов из каждого потока
-
+    lock = threading.Lock()
     for i in range(num_threads):
         start = i * chunk_size
-        end = (i + 1) * chunk_size if i < num_threads - 1 else len(data)
-        thread = threading.Thread(target=lambda: global_results.append(count_bitonic_subsequences(data, start, end)))
+        end = (i + 1) * chunk_size + 2 if i < num_threads - 1 else len(data)  # последний поток
+        thread = threading.Thread(target=find_bitonic_count, args=(data, start, end, result))
         threads.append(thread)
-
-    for thread in threads:
         thread.start()
 
     for thread in threads:
         thread.join()
 
-    # Объединяем результаты из каждого потока и суммируем их
-    total_count = sum(global_results)
+    total_count = sum(result)
     print(f"Количество битонических подпоследовательностей: {total_count}")
+
+
+def multiprocess_find_bitonic(data: list[int], num_process: int) -> int:
+    """
+    Параллельный подсчет количества всех битонических подпоследовательностей в массиве, Процессами
+    """
+    q = Queue()
+    chunk_size = len(data) // num_process
+    list_process = []
+    for i in range(num_process):
+        start = i * chunk_size
+        end = (i + 1) * chunk_size + 2 if i < num_process - 1 else len(data)  # последний поток
+        process = Process(target=find_bitonic_count, args=(data, start, end, q))
+        list_process.append(process)
+        process.start()
+
+    for proc in list_process:
+        proc.join()
+    total_count = sum([q.get() for i in range(num_process)])
+    print(f"Количество битонических подпоследовательностей: {total_count}")
+
+
+def find_bitonic_count_for_pool(data_indices):
+    """
+    Подсчет количества битонических подпоследовательностей в части массива по индексам
+    Сложность O(n)
+    """
+    data, start, end = data_indices[0], data_indices[1], data_indices[2]
+    up = down = False
+    cnt = 0
+    for i in range(start, end - 1):
+        if data[i + 1] > data[i]:
+            up = True
+            if down:
+                cnt += 1
+                down = False
+        elif data[i + 1] < data[i]:
+            down = True
+            if up:
+                cnt += 1
+                up = False
+    return cnt
+
+
+def multiprocess_find_bitonic_pool(data: list[int], num_process: int) -> int:
+    """
+    Параллельный подсчет количества всех битонических подпоследовательностей в массиве, используя Pool
+    """
+    chunk_size = len(data) // num_process
+    pool = Pool(processes=num_process)
+    results = pool.map(find_bitonic_count,
+                       [(data, i * chunk_size, (i + 1) * chunk_size + 2 if i < num_process - 1 else len(data),) for i in
+                        range(num_process)])
+    pool.close()
+    pool.join()
+    total_count = sum(results)
+    print(f"Количество битонических подпоследовательностей: {total_count}")
+
+
+def count_bitonic_in_subarray(data: list[int], start: int = 0, end=None, result=None) -> int:
+    """
+    Сложность O(n)
+    """
+    if end is None:
+        end = len(data)
+
+    if len(data) < 3:
+        return
+    trend = "none"
+    trend_changes = 0
+    current_trend_length = 1
+    for i in range(start + 1, end):
+        if data[i] > data[i - 1]:
+            if trend == "decreasing":
+                if current_trend_length > 2:
+                    trend_changes += 1
+                current_trend_length = 1
+            trend = "increasing"
+            current_trend_length += 1
+        elif data[i] < data[i - 1]:
+            if trend == "increasing":
+                if current_trend_length > 2:
+                    trend_changes += 1
+                current_trend_length = 1
+            trend = "decreasing"
+            current_trend_length += 1
+    if result is None:
+        return print(f'Количество битонических подпоследовательностей: {trend_changes}')
+    result.append(trend_changes)
+
+
+def threading_count_all_bitonic(data: int, num_threads: int) -> int:
+    """
+    Сложность O(n)
+    """
+    chunk_size = len(data) // num_threads
+    threads = []
+    result = []
+
+    for i in range(num_threads):
+        start = i * chunk_size
+        end = (i + 1) * chunk_size + 2 if i < num_threads - 1 else len(data)
+        thread = threading.Thread(target=count_bitonic_in_subarray, args=(data, start, end, result))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    total_changes = sum(result)
+    print(f"Количество битонических переключений: {total_changes}")
+
+
+if __name__ == '__main__':
+    # генерация данных
+    data = create_data(10)
+
+    # визуализация
+    # vizulation(data)
+
+    # подсчет битонических без потоков
+    start = perf_counter()
+    find_bitonic_count(data)
+    end = perf_counter()
+    print(f"Затрачено времени: {end - start:.5f},  на список длиной: {len(data)}\n")
+
+    # подсчет битонических с потоками
+    start = perf_counter()
+    num_threads = 4  # Укажите желаемое количество потоков
+    threading_find_all_bitonic(data, num_threads)
+    end = perf_counter()
+    print(f"Затрачено времени (threading): {end - start:.5f}, на список длиной: {len(data)}\n")
+
+    # подсчет битонических multiprocessing
+    start = perf_counter()
+    num_process = 16
+    multiprocess_find_bitonic(data, num_process)
+    end = perf_counter()
+    print(f"Затрачено времени (multiprocessing): {end - start:.5f}, на список длиной: {len(data)}\n")
+
+    # подсчет битонических multiprocessing Pool
+    start = perf_counter()
+    num_process = 16
+    multiprocess_find_bitonic_pool(data, num_process)
+    end = perf_counter()
+    print(f"Затрачено времени (multiprocessing.Pool): {end - start:.5f}, на список длиной: {len(data)}\n")
+
+    # подсчет битонических с некоторым правилом (см. рис)
+    start = perf_counter()
+    count_bitonic_in_subarray(data)
+    end = perf_counter()
+    print(f"Затрачено времени: {end - start:.5f},  на список длиной: {len(data)}\n")
+
+    # подсчет битонических с некоторым правилом (см. рис) потоки
+    start = perf_counter()
+    num_threads = 4  # Укажите желаемое количество потоков
+    threading_count_all_bitonic(data, num_threads)
+    end = perf_counter()
+    print(f"Затрачено времени (threading): {end - start:.5f},  на список длиной: {len(data)}\n")
