@@ -11,6 +11,7 @@ import threading
 from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
+from numba import njit
 
 
 def create_data(n: int, left=-5, right=10) -> list[int]:
@@ -19,6 +20,8 @@ def create_data(n: int, left=-5, right=10) -> list[int]:
     """
     return [random.randint(left, right) for i in range(n)]
 
+
+@njit
 def create_data_n(n: int, left=-5, right=10) -> list[int]:
     """
     Генерация списка из целых чисел, длиной N, numpy
@@ -45,14 +48,10 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
     Проверка разделенного списка, то есть не разделили ли там где происходят переключения
     """
     if len(data) == end:
-        # print('start', start)
-        # print([data[start]])
         return
     # Пик максимум
     if data[end - 1] < data[end] > data[end + 1]:
-        print("Пик максимум")
-        # print(data[end])
-        # print(data[8:14])
+        # print("Пик максимум")
         for i in range(1, chunk - 1):
             if data[end + 1] > data[end + i + 1]:
                 return 1
@@ -60,9 +59,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                 return 2
     # Пик минимум
     if data[end - 1] > data[end] < data[end + 1]:
-        print("Пик минимум")
-        # print(data[end])
-        # print(data[8:14])
+        # print("Пик минимум")
         for i in range(1, chunk - 1):
             if data[end + 1] < data[end + i + 1]:
                 return 1
@@ -70,9 +67,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                 return 2
     # разделение в промежутке возрастания
     if data[end - 1] < data[end] < data[end + 1]:
-        print("разделение в промежутке возрастания")
-        # print(data[end])
-        # print(data[8:14])
+        # print("разделение в промежутке возрастания")
         for i in range(1, chunk - 1):
             if data[end + 1] < data[end + i + 1]:
                 return
@@ -80,9 +75,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                 return 1
     # разделение в промежутке убывания
     if data[end - 1] > data[end] > data[end + 1]:
-        print("разделение в промежутке убывания")
-        # print(data[end])
-        # print(data[8:14])
+        # print("разделение в промежутке убывания")
         for i in range(1, chunk - 1):
             if data[end + 1] < data[end + i + 1]:
                 return 1
@@ -90,10 +83,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                 return
     # равные
     if data[end - 1] == data[end] == data[end + 1]:
-        print("равные")
-        # print(data[end])
-        # print(data[8:14])
-        # Условимся на том что в списке не будет больше 3 одинаковых повторяющихся (уже нет)
+        # print("равные")
         for i in range(1, chunk - 1):
             if data[end] < data[end - i]:
                 for i in range(1, chunk - 1):
@@ -110,9 +100,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
             return 1
     # правый край равенство, левый неравество (максимум -> не факт)
     if data[end - 1] < data[end] == data[end + 1]:
-        print("правый край равенство, левый неравество (максимум -> не факт)")
-        # print(data[end])
-        # print(data[8:14])
+        # print("правый край равенство, левый неравество (максимум -> не факт)")
         for i in range(1, chunk - 1):
             if data[end] > data[end + i]:
                 return 1
@@ -120,9 +108,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                 return
     # левый равенство, правый неравенство (максимум -> не факт)
     if data[end - 1] == data[end] > data[end + 1]:
-        print("левый равенство, правый неравенство (максимум -> не факт)")
-        # print(data[end])
-        # print(data[8:14])
+        # print("левый равенство, правый неравенство (максимум -> не факт)")
         for i in range(1, chunk - 1):
             if data[end - i] < data[end]:
                 for i in range(1, chunk - 1):
@@ -138,9 +124,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
                         return
     # правый край равенство, левый неравество (минимум  -> не факт)
     if data[end - 1] > data[end] == data[end + 1]:
-        print("правый край равенство, левый неравество (минимум  -> не факт)")
-        # print(data[end])
-        # print(data[8:14])
+        # print("правый край равенство, левый неравество (минимум  -> не факт)")
         for i in range(1, chunk - 1):
             if data[end] > data[end + i]:
                 return
@@ -150,9 +134,7 @@ def checker_peak(data: list[int], start: int, end: int, chunk: int) -> int:
 
     # левый равенство, правый неравенство (минимум  -> не факт)
     if data[end - 1] == data[end] < data[end + 1]:
-        print("левый равенство, правый неравенство (минимум  -> не факт)")
-        # print(data[end])
-        # print(data[8:14])
+        # print("левый равенство, правый неравенство (минимум  -> не факт)")
         for i in range(1, chunk - 1):
             if data[end] < data[end - i]:
                 for i in range(1, chunk - 1):
@@ -215,7 +197,7 @@ def threading_find_all_bitonic(data: list[int], num_threads: int) -> int:
     result = []
     chunk_size = len(data) // num_threads
     threads = []
-    lock = threading.Lock()
+    # lock = threading.Lock()
     for i in range(num_threads):
         start = i * chunk_size
         if i > 0:
@@ -269,53 +251,10 @@ def multiprocess_find_bitonic(data: list[int], num_process: int) -> int:
     print(f"Количество битонических подпоследовательностей: {total_count}")
 
 
-def find_bitonic_count_for_pool(data_indices):
-    """
-    Подсчет количества битонических подпоследовательностей в части массива по индексам
-    Сложность O(n)
-    """
-    data, start, end = data_indices[0], data_indices[1], data_indices[2]
-    up = down = False
-    cnt = 0
-    for i in range(start, end - 1):
-        if data[i + 1] > data[i]:
-            up = True
-            if down:
-                cnt += 1
-                down = False
-        elif data[i + 1] < data[i]:
-            down = True
-            if up:
-                cnt += 1
-                up = False
-    return cnt
-
-
-def multiprocess_find_bitonic_pool(data: list[int], num_process: int) -> int:
-    """
-    Параллельный подсчет количества всех битонических подпоследовательностей в массиве, используя Pool
-    """
-    results = []
-    chunk_size = len(data) // num_process
-    pool = Pool(processes=num_process)
-    for i in range(num_process):
-        start = i * chunk_size
-        if i > 0:
-            start += 1
-        end = (i + 1) * chunk_size if i < num_process - 1 else len(data)
-        # проверка
-        add_cnt = checker_peak(data, start, end, chunk_size)
-        if add_cnt:
-            results.append(add_cnt)
-        result = pool.map(find_bitonic_count_for_pool, ([data, start, end], ))
-        results.append(result[0])
-    total_count = sum(results)
-    print(f"Количество битонических подпоследовательностей: {total_count}")
-
-
 if __name__ == '__main__':
     # генерация данных
-    data = create_data(1000)
+    # data = create_data(1_000_000_00)
+    data = create_data_n(100_000)
     # print(data)
 
     # визуализация
@@ -325,38 +264,21 @@ if __name__ == '__main__':
     start = perf_counter()
     find_bitonic_count(data)
     end = perf_counter()
-    print(f"Затрачено времени: {end - start:.5f},  на список длиной: {len(data)}\n")
+    print(
+        f"---Последовательный---\n\tЗатрачено времени: {end - start:.5f} \n\tДлина списка: {len(data)} \n\tСтруктура данных: numpy array\n")
 
     # подсчет битонических с потоками
     start = perf_counter()
     num_threads = 4  # Укажите желаемое количество потоков
     threading_find_all_bitonic(data, num_threads)
     end = perf_counter()
-    print(f"Затрачено времени (threading): {end - start:.5f}, на список длиной: {len(data)}\n")
+    print(
+        f"---Потоки {num_threads}---\n\tЗатрачено времени: {end - start:.5f} \n\tДлина списка: {len(data)} \n\tСтруктура данных: numpy array\n")
 
     # подсчет битонических multiprocessing
     start = perf_counter()
     num_process = 4
     multiprocess_find_bitonic(data, num_process)
     end = perf_counter()
-    print(f"Затрачено времени (multiprocessing): {end - start:.5f}, на список длиной: {len(data)}\n")
-    #
-    # # подсчет битонических multiprocessing Pool
-    start = perf_counter()
-    num_process = 4
-    multiprocess_find_bitonic_pool(data, num_process)
-    end = perf_counter()
-    print(f"Затрачено времени (multiprocessing.Pool): {end - start:.5f}, на список длиной: {len(data)}\n")
-    #
-    # # подсчет битонических с некоторым правилом (см. рис)
-    # start = perf_counter()
-    # count_bitonic_in_subarray(data)
-    # end = perf_counter()
-    # print(f"Затрачено времени: {end - start:.5f},  на список длиной: {len(data)}\n")
-    #
-    # # подсчет битонических с некоторым правилом (см. рис) потоки
-    # start = perf_counter()
-    # num_threads = 4  # Укажите желаемое количество потоков
-    # threading_count_all_bitonic(data, num_threads)
-    # end = perf_counter()
-    # print(f"Затрачено времени (threading): {end - start:.5f},  на список длиной: {len(data)}\n")
+    print(
+        f"---Мультипроцессинг {num_process}---\n\tЗатрачено времени: {end - start:.5f} \n\tДлина списка: {len(data)} \n\tСтруктура данных: numpy array\n")
