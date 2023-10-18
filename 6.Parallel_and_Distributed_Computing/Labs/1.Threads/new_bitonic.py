@@ -347,16 +347,3 @@ if __name__ == '__main__':
     multiprocess_find_bitonic_pool(data, num_process)
     end = perf_counter()
     print(f"Затрачено времени (multiprocessing.Pool): {end - start:.5f}, на список длиной: {len(data)}\n")
-    #
-    # # подсчет битонических с некоторым правилом (см. рис)
-    # start = perf_counter()
-    # count_bitonic_in_subarray(data)
-    # end = perf_counter()
-    # print(f"Затрачено времени: {end - start:.5f},  на список длиной: {len(data)}\n")
-    #
-    # # подсчет битонических с некоторым правилом (см. рис) потоки
-    # start = perf_counter()
-    # num_threads = 4  # Укажите желаемое количество потоков
-    # threading_count_all_bitonic(data, num_threads)
-    # end = perf_counter()
-    # print(f"Затрачено времени (threading): {end - start:.5f},  на список длиной: {len(data)}\n")
