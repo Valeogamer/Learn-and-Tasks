@@ -31,7 +31,7 @@ import time
 
 
 @njit
-def create_data(n: int, left: int = 0, right: int = 1) -> list[int]:
+def create_data(n: int, left: int = 0, right: int = 10) -> list[int]:
     """
     Генерация списка из целых чисел, длиной N
     """
@@ -69,11 +69,11 @@ def bitonicMerge(a: list[int], low: int, cnt: int, dire: int):
     if cnt > 1:
         k = cnt // 2
         for i in range(low, low + k):
-            print(a[i:i+k], '\t', a[i])
+            # print(a[i:i+k], '\t', a[i])
             compAndSwap(a, i, i + k, dire)
-        print(a[low:k], '\t', a[low])
+        # print(a[low:k], '\t', a[low])
         bitonicMerge(a, low, k, dire)
-        print(a[low+k:k], '\t', a[low])
+        # print(a[low+k:k], '\t', a[low])
         bitonicMerge(a, low + k, k, dire)
 
 
@@ -87,9 +87,9 @@ def bitonicSort(a: list[int], low: int, cnt: int, dire: int):
     """
     if cnt > 1:
         k = cnt // 2
-        print(a[low:k], '\t', a[low])  # отладочное
+        # print(a[low:k], '\t', a[low])  # отладочное
         bitonicSort(a, low, k, 1)
-        print(a[low+k:k], '\t', a[low])  # отладочное
+        # print(a[low+k:k], '\t', a[low])  # отладочное
         bitonicSort(a, low + k, k, 0)
         bitonicMerge(a, low, cnt, dire)
 
@@ -105,9 +105,11 @@ def sort(a: list[int], N: int, up: int):
 
 if __name__ == '__main__':
     # arr_b = create_data_n(16_777_216)
+    # arr_b = create_data_n(4_194_304)
+    # arr_b = create_data_n(262_144)
+    # arr_b = create_data(16_777_216)
     # arr_b = create_data(4_194_304)
     arr_b = create_data(262_144)
-    # arr_b = [3, 4, 7, 8, 6, 5, 2, 1]
     n = len(arr_b)
     up = 1  # возрастание
 
