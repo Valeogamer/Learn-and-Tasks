@@ -110,6 +110,7 @@ if __name__ == '__main__':
     # arr_b = create_data(16_777_216)
     # arr_b = create_data(4_194_304)
     arr_b = create_data(262_144)
+    # arr_b = create_data(32)
     n = len(arr_b)
     up = 1  # возрастание
 
