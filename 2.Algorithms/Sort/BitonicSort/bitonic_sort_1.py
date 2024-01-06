@@ -19,7 +19,6 @@
 
     Входные данные:
     Количество элементов в массиве степень 2
-    Желаетельно чтобы массив состоял из 0 и 1
     Выходные данные: отсортированный массив
 
 """
@@ -43,7 +42,8 @@ def create_data_n(n: int, left: int = 0, right: int = 1) -> list[int]:
     """
     Генерация массива из целых чисел, длиной N
     """
-    return np.random.randint(left, right, n)
+    # return np.random.randint(left, right, n)
+    return np.random.normal(5, 1, 262_144)
 
 
 def compAndSwap(a: list[int], i: int, j: int, dire: int):
@@ -79,7 +79,7 @@ def bitonicMerge(a: list[int], low: int, cnt: int, dire: int):
 
 def bitonicSort(a: list[int], low: int, cnt: int, dire: int):
     """
-    Рекурсивная функцияя битонной сортировки
+    Рекурсивная функция битонной сортировки
     a: массив
     low: индекс начала текущей последоваетельности в массиве
     cnt: кол-во элементов в текущей последовательности
@@ -109,7 +109,8 @@ if __name__ == '__main__':
     # arr_b = create_data_n(262_144)
     # arr_b = create_data(16_777_216)
     # arr_b = create_data(4_194_304)
-    arr_b = create_data(262_144)
+    # arr_b = create_data(262_144)
+    arr_b = create_data(8)
     # arr_b = create_data(32)
     n = len(arr_b)
     up = 1  # возрастание
@@ -120,6 +121,6 @@ if __name__ == '__main__':
     print(
         f"\t-Последовательная-\nСтруктура данных: {type(arr_b)}\nКоличество элементов: {n}\nЗатрачено времени: {(end - start):0.03f}")
 
-    # print("\n\nОтсортированные элементы")
-    # for i in range(n):
-    #     print("%d" % arr_b[i], end=" ")
+    print("\n\nОтсортированные элементы")
+    for i in range(n):
+        print("%d" % arr_b[i], end=" ")

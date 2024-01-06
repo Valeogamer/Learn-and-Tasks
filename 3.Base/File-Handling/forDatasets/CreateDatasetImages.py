@@ -99,10 +99,10 @@ if __name__ == '__main__':
     new_name_Pronation = 'pronation'
     new_name_Overpronation = 'overpronation'
     new_extention = 'png'
-    path_dir_Pronation = "c://Users//User//Desktop//Разметка Тесты//BigFootBackup//Pronation"
-    path_dir_Overpronation = "c://Users//User//Desktop//Разметка Тесты//BigFootBackup//Overpronation"
-    # newName_newExtention(path_dir_Pronation, new_name_Pronation, new_extention)
-    # newName_newExtention(path_dir_Overpronation, new_name_Overpronation, new_extention)
+    path_dir_Pronation = "c://Users//User//Desktop//Разметка Тесты//BigFootBalance//Pronation"
+    path_dir_Overpronation = "c://Users//User//Desktop//Разметка Тесты//BigFootBalance//Overpronation"
+    newName_newExtention(path_dir_Pronation, new_name_Pronation, new_extention)
+    newName_newExtention(path_dir_Overpronation, new_name_Overpronation, new_extention)
     logging.info(f'{datetime.datetime.now()}\: All files renamed.')
     images_path_Pronation = [path_dir_Pronation + '//' + i for i in os.listdir(path_dir_Pronation)]
     images_path_Overpronation = [path_dir_Overpronation + '//' + i for i in os.listdir(path_dir_Overpronation)]
