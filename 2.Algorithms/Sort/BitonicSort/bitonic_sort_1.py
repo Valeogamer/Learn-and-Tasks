@@ -19,7 +19,6 @@
 
     Входные данные:
     Количество элементов в массиве степень 2
-    Желаетельно чтобы массив состоял из 0 и 1
     Выходные данные: отсортированный массив
 
 """
@@ -31,7 +30,7 @@ import time
 
 
 @njit
-def create_data(n: int, left: int = 0, right: int = 1) -> list[int]:
+def create_data(n: int, left: int = 0, right: int = 10) -> list[int]:
     """
     Генерация списка из целых чисел, длиной N
     """
@@ -43,7 +42,8 @@ def create_data_n(n: int, left: int = 0, right: int = 1) -> list[int]:
     """
     Генерация массива из целых чисел, длиной N
     """
-    return np.random.randint(left, right, n)
+    # return np.random.randint(left, right, n)
+    return np.random.normal(5, 1, 262_144)
 
 
 def compAndSwap(a: list[int], i: int, j: int, dire: int):
@@ -69,17 +69,17 @@ def bitonicMerge(a: list[int], low: int, cnt: int, dire: int):
     if cnt > 1:
         k = cnt // 2
         for i in range(low, low + k):
-            print(a[i:i+k], '\t', a[i])
+            # print(a[i:i+k], '\t', a[i])
             compAndSwap(a, i, i + k, dire)
-        print(a[low:k], '\t', a[low])
+        # print(a[low:k], '\t', a[low])
         bitonicMerge(a, low, k, dire)
-        print(a[low+k:k], '\t', a[low])
+        # print(a[low+k:k], '\t', a[low])
         bitonicMerge(a, low + k, k, dire)
 
 
 def bitonicSort(a: list[int], low: int, cnt: int, dire: int):
     """
-    Рекурсивная функцияя битонной сортировки
+    Рекурсивная функция битонной сортировки
     a: массив
     low: индекс начала текущей последоваетельности в массиве
     cnt: кол-во элементов в текущей последовательности
@@ -87,9 +87,9 @@ def bitonicSort(a: list[int], low: int, cnt: int, dire: int):
     """
     if cnt > 1:
         k = cnt // 2
-        print(a[low:k], '\t', a[low])  # отладочное
+        # print(a[low:k], '\t', a[low])  # отладочное
         bitonicSort(a, low, k, 1)
-        print(a[low+k:k], '\t', a[low])  # отладочное
+        # print(a[low+k:k], '\t', a[low])  # отладочное
         bitonicSort(a, low + k, k, 0)
         bitonicMerge(a, low, cnt, dire)
 
@@ -105,9 +105,13 @@ def sort(a: list[int], N: int, up: int):
 
 if __name__ == '__main__':
     # arr_b = create_data_n(16_777_216)
+    # arr_b = create_data_n(4_194_304)
+    # arr_b = create_data_n(262_144)
+    # arr_b = create_data(16_777_216)
     # arr_b = create_data(4_194_304)
-    arr_b = create_data(262_144)
-    # arr_b = [3, 4, 7, 8, 6, 5, 2, 1]
+    # arr_b = create_data(262_144)
+    arr_b = create_data(8)
+    # arr_b = create_data(32)
     n = len(arr_b)
     up = 1  # возрастание
 
@@ -117,6 +121,6 @@ if __name__ == '__main__':
     print(
         f"\t-Последовательная-\nСтруктура данных: {type(arr_b)}\nКоличество элементов: {n}\nЗатрачено времени: {(end - start):0.03f}")
 
-    # print("\n\nОтсортированные элементы")
-    # for i in range(n):
-    #     print("%d" % arr_b[i], end=" ")
+    print("\n\nОтсортированные элементы")
+    for i in range(n):
+        print("%d" % arr_b[i], end=" ")
