@@ -1,16 +1,30 @@
 import socket
 
-host = "127.0.0.1"  # адресс локального хоста
-port = 2000  # порт
+def start_tcp_server(host='127.0.0.1', port=65432):
+    # Создаем сокет
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # AF_INET используется для адресов IPv4
+        # SOCK_STREAM используется для сокетов TCP
+        # SOCK_DGRAM используется для сокетов UDP
+        # Привязываем сокет к хосту и порту
+        s.bind((host, port))
+        # Переводим сокет в режим прослушивания
+        s.listen()
+        print(f"Сервер слушает {host}:{port}")
+        # Принимаем соединение
+        conn, addr = s.accept()
+        with conn:
+            print(f"Соединение с {addr}")
+            while True:
+                # Получаем данные от клиента, размер буфера 1024 байта
+                # recv получение данных от клиента
+                data = conn.recv(1024)
+                if not data:
+                    break
+                print(f"Получены данные: {data.decode()}")
+                # Отправляем данные обратно клиенту (эхо)
+                conn.sendall(data)
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))
+if __name__ == "__main__":
+    start_tcp_server()
 
-server.listen()
-
-while True:
-    user, adres = server.accept()
-    user.send("connect".encode("utf-8"))
-
-    data = user.recv(1024)
-    print(data.decode("utf-8"))

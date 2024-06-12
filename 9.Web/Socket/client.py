@@ -1,14 +1,15 @@
 import socket
 
-host = "127.0.0.1"
-port = 2000
+def start_tcp_client(host='127.0.0.1', port=65432):
+    # Создаем сокет
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # Подключаемся к серверу
+        s.connect((host, port))
+        # Отправляем данные серверу
+        s.sendall(b'Hello, world')
+        # Получаем ответ от сервера
+        data = s.recv(1024)
+        print(f"Received {data.decode()}")
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-client.connect((host, port))
-
-while True:
-    data = client.recv(1024)
-    print(data.decode("utf-8"))
-
-    client.send(input().encode("utf-8"))
+if __name__ == "__main__":
+    start_tcp_client()
